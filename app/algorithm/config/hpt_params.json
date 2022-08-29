@@ -1,0 +1,22 @@
+[
+  {
+    "name": "n_estimators",
+    "short_desc": "The number of trees in the forest.",
+    "default": 200,
+    "type": "int",
+    "search_type": "uniform",
+    "range_low": 100,
+    "range_high": 500,
+    "run_HPO": true
+  },
+  {
+    "name": "learning_rate",
+    "short_desc": "Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution of each classifier.",
+    "default": 1.0,
+    "type": "real",
+    "search_type": "uniform",
+    "range_low": 1e-4,
+    "range_high": 5.0,
+    "run_HPO": true
+  }
+]
