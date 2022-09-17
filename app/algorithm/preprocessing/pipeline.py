@@ -55,7 +55,7 @@ def get_preprocess_pipeline(pp_params, model_cfg):
     
     pipe_steps = []
     
-    # ===== ADD TARGET FEATURE COLUMN IF NOT PRESENT (THIS CAN HAPPEN FOR TEST ATA)   =====
+    # ===== ADD TARGET FEATURE COLUMN IF NOT PRESENT (THIS CAN HAPPEN FOR TEST DATA)   =====
     pipe_steps.append(
         (
             pp_step_names["TARGET_FEATURE_ADDER"],
@@ -264,7 +264,6 @@ def get_preprocess_pipeline(pp_params, model_cfg):
     # ===============================================================    
       
     pipeline = Pipeline( pipe_steps )
-    
     return pipeline
 
 

@@ -18,6 +18,7 @@
       "forced_missing_perc": 0.03
     },
     "pp_step_names": {
+      "DUMMY_COL_CREATOR": "dummy_col_creator",
       "COLUMN_SELECTOR": "column_selector",
       "STRING_TYPE_CASTER": "string_type_caster",
       "FLOAT_TYPE_CASTER": "float_type_caster",

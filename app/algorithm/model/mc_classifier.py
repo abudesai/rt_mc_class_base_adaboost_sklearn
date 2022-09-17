@@ -10,7 +10,7 @@ from sklearn.ensemble import AdaBoostClassifier
 # from sklearn.svm import SVC
 
 model_fname = "model.save"
-MODEL_NAME = "multi_class_base_svc_sklearn"
+MODEL_NAME = "multi_class_base_adaboost_sklearn"
 
 
 class Classifier(): 

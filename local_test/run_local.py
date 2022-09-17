@@ -139,22 +139,28 @@ def load_and_test_algo():
     # save predictions
     utils.save_dataframe(predictions, testing_outputs_path, "test_predictions.csv")
     # score the results
-    results = score(test_data, predictions, data_schema)  
+    test_key = get_test_key()
+    results = score(test_key, predictions, data_schema)  
     print("done with predictions")
     return results
 
 
-def score(test_data, predictions, data_schema): 
+def get_test_key():
+    test_key = pd.read_csv(f"{local_datapath}/{dataset_name}/{dataset_name}_test_key.csv")
+    return test_key
+
+
+def score(test_key, predictions, data_schema): 
     # we need to get a couple of field names in the test_data file to do the scoring 
     # we get it using the schema file
     id_field = data_schema["inputDatasets"]["multiClassClassificationBaseMainInput"]["idField"]
     target_field = data_schema["inputDatasets"]["multiClassClassificationBaseMainInput"]["targetField"]
-        
+            
     pred_class_names = [ c for c in predictions.columns[1:]    ]  
     
     predictions["__pred_class"] = pd.DataFrame(predictions[pred_class_names], columns = pred_class_names).idxmax(axis=1)  
-    predictions = predictions.merge(test_data[[id_field, target_field]], on=[id_field])
-    pred_probabilities = predictions[pred_class_names].copy()
+    predictions = predictions.merge(test_key[[id_field, target_field]], on=[id_field])
+    predictions = predictions[predictions[target_field].isin(pred_class_names)]    
     
     Y = predictions[target_field].astype(str)
     Y_hat = predictions["__pred_class"].astype(str)    
@@ -168,8 +174,8 @@ def score(test_data, predictions, data_schema):
     name_to_idx_dict = {str(n):i for i,n in enumerate(pred_class_names)}
     mapped_classes_true = Y.map(name_to_idx_dict)     
     
-    auc = roc_auc_score(mapped_classes_true, pred_probabilities[pred_class_names].values, 
-        labels=np.arange(len(pred_class_names)), average='weighted', multi_class='ovo')     
+    auc = roc_auc_score(mapped_classes_true, predictions[pred_class_names].values, 
+        labels=np.arange(len(pred_class_names)), average='weighted', multi_class='ovo')   
     
     # -------------------------------------   
     scores = { 
@@ -178,7 +184,7 @@ def score(test_data, predictions, data_schema):
                "precision": np.round(precision, 4), 
                "recall": np.round(recall, 4), 
                "auc_score": np.round(auc, 4), 
-               "perc_pred_missing": np.round( 100 * (1 - predictions.shape[0] / test_data.shape[0]), 2)
+               "perc_pred_missing": np.round( 100 * (1 - predictions.shape[0] / test_key.shape[0]), 2)
                }
     return scores
 
@@ -232,12 +238,12 @@ def run_train_and_test(dataset_name, run_hpt, num_hpt_trials):
 
 if __name__ == "__main__": 
     
-    num_hpt_trials = 50
+    num_hpt_trials = 30
     run_hpt_list = [False, True]
-    # run_hpt_list = [False]
+    run_hpt_list = [False]
     
     datasets = ["car", "primary_tumor", "splice", "statlog", "steel_plate_fault", "wine"]
-    # datasets = ["car"]
+    # datasets = ["primary_tumor"]
     
     for run_hpt in run_hpt_list:
         all_results = []
